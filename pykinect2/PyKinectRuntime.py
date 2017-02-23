@@ -176,7 +176,7 @@ class PyKinectRuntime(object):
         self._last_long_exposure_infrared_frame_access = self._last_long_exposure_infrared_frame_time = start_clock
         self._last_audio_frame_access = self._last_audio_frame_time = start_clock
 		
-	def get_point_cloud(self):
+    def get_point_cloud(self):
         pointCloud_p = ctypes.pointer(self._point_cloud_data[0])
         self._mapper.MapColorFrameToCameraSpace(512 * 424, self._depth_frame_data, 1920 * 1080, pointCloud_p)
         p = ctypes.cast(pointCloud_p, ctypes.POINTER(ctypes.c_float))
@@ -200,7 +200,7 @@ class PyKinectRuntime(object):
             self._body_source = None
 
             self._body_frame_data = None
-			self._point_cloud_data = None
+            self._point_cloud_data = None
 
             self._sensor.Close()
             self._sensor = None
