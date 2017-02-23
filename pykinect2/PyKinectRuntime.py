@@ -101,6 +101,10 @@ class PyKinectRuntime(object):
         self._infrared_frame_data = None
         self._long_exposure_infrared_frame_data = None
         self._audio_frame_data = None
+		
+		# point cloud storage
+        point_count = 1920*1080
+        self._point_cloud_data = (_CameraSpacePoint * point_count)()
 
         if(self.frame_source_types & FrameSourceTypes_Color):
             self._color_frame_data = ctypes.POINTER(ctypes.c_ubyte) 
@@ -171,6 +175,14 @@ class PyKinectRuntime(object):
         self._last_infrared_frame_access = self._last_infrared_frame_time = start_clock
         self._last_long_exposure_infrared_frame_access = self._last_long_exposure_infrared_frame_time = start_clock
         self._last_audio_frame_access = self._last_audio_frame_time = start_clock
+		
+	def get_point_cloud(self):
+        pointCloud_p = ctypes.pointer(self._point_cloud_data[0])
+        self._mapper.MapColorFrameToCameraSpace(512 * 424, self._depth_frame_data, 1920 * 1080, pointCloud_p)
+        p = ctypes.cast(pointCloud_p, ctypes.POINTER(ctypes.c_float))
+        result = numpy.ctypeslib.as_array(p, shape=(1080, 1920, 3))
+
+        return result
 
     def close(self):
         if self._sensor is not None:
@@ -188,6 +200,7 @@ class PyKinectRuntime(object):
             self._body_source = None
 
             self._body_frame_data = None
+			self._point_cloud_data = None
 
             self._sensor.Close()
             self._sensor = None
